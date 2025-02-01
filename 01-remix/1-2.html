@@ -22,8 +22,8 @@
         <div class="rules">
             <a class="rule">Rule 1: Weight</a>
             <div class="variations">
-                <a href="1-1.html" class="var-item thispage">1</a>
-                <a href="1-2.html" class="var-item">2</a>
+                <a href="1-1.html" class="var-item">1</a>
+                <a href="1-2.html" class="var-item thispage">2</a>
                 <a href="1-3.html" class="var-item">3</a>
                 <a href="1-4.html" class="var-item">4</a>
             </div>
@@ -67,75 +67,67 @@
     </nav>
 
     <main>
-        <p class = "l1">Homework, I love you.</p>
-        <p class = "l2">I think that you're great.</p>
-        <p class = "l3">It's wonderful fun when you keep me up late.</p>
-        <p class = "l4">I think you're the best when I'm totally stressed,</p>
-        <p class = "l5">preparing and cramming all night for a test.</p>
+        <p class="l1"><span class="negative">Homework</span>, I love you.</p>
+        <p>I think that you're <span class="positive">great.</span></p>
+        <p>It's <span class="positive">wonderful</span> fun when you <span class="negative">keep me up late.</span></p>
+        <p>I think you're the <span class="positive">best</span> when I'm totally <span class="negative">stressed,</span></p>
+        <p>preparing and <span class="negative">cramming</span> all night for a test.</p>
         <br>
 
-        <p class = "l1">Homework, I love you.</p>
-        <p class = "l2">What more can I say?</p>
-        <p class = "l3">I love to do hundreds of problems each day.</p>
-        <p class = "l4">You boggle my mind and you make me go blind,</p>
-        <p class = "l5">but still I'm ecstatic that you were assigned.</p>
+        <p class="l1"><span class="negative">Homework</span>, I love you.</p>
+        <p>What more can I say?</p>
+        <p>I <span class="positive">love</span> to do hundreds of <span class="negative">problems</span> each day.</p>
+        <p>You <span class="negative">boggle</span> my mind and you make me go blind,</p>
+        <p>but still I'm <span class="positive">ecstatic</span> that you were <span class="negative">assigned.</span></p>
         <br>
         
-        <p class = "l1">Homework, I love you.</p>
-        <p class = "l2">I tell you, it's true.</p>
-        <p class = "l3">There's nothing more fun or exciting to do.</p>
-        <p class = "l4">You're never a chore, for it's you I adore.</p>
-        <p class = "l5">I wish that our teacher would hand you out more.</p>
+        <p class="l1"><span class="negative">Homework</span>, I love you.</p>
+        <p>I tell you, it's true.</p>
+        <p>There's <span class="negative">nothing</span> more <span class="positive">fun</span> or <span class="positive">exciting</span> to do.</p>
+        <p>You're never a <span class="negative">chore,</span> for it's you I <span class="positive">adore.</span></p>
+        <p>I wish that our teacher would hand you out <span class="negative">more.</span></p>
         <br>
         
-        <p class = "l1">Homework, I love you.</p>
-        <p class = "l2">You thrill me inside.</p>
-        <p class = "l3">I'm filled with emotions. I'm fit to be tied.</p>
-        <p class = "l4">I cannot complain when you frazzle my brain.</p>
-        <p class = "l5">Of course, that's because I'm completely insane.</p>
+        <p class="l1"><span class="negative">Homework</span>, I love you.</p>
+        <p>You <span class="negative">thrill</span> me inside.</p>
+        <p>I'm filled with emotions. I'm fit to be <span class="negative">tied.</span></p>
+        <p>I cannot complain when you <span class="negative">frazzle</span> my brain.</p>
+        <p>Of course, that's because I'm completely <span class="negative">insane.</span></p>
     </main>
 
     <footer>
         <a>Homework, I love you Poem by Kenn Nesbitt</a>
         <a>Data as Material | Spring 2025 @ Monsicha Srisuantang</a>
     </footer>
-
 </body>
 
 <style>
     main {
-        margin: 4rem 0 1rem 1rem;
+        margin: 4rem 0 2rem 0;
     }
 
     p {
-        font-family: "ds-ddungsang-variable", sans-serif;
-        text-align: justify;
+        font-family: "valnera-variable", sans-serif;
+        text-align: center;
         word-spacing: normal;
         letter-spacing: normal;
-        font-size: 4vw;
+        font-size: 4rem;
         margin: 0;
         padding: 0;
+        font-variation-settings: "DSTN" 200, "ROTN" 200, "wght" 200;
     }
 
     .l1{
-        font-size: 8vw;
-        font-variation-settings: "wght" 400;
+        margin-top: 4rem;
+        font-size: 8rem;
     }
 
-    .l2 {
-        font-variation-settings: "wght" 500;
+    .negative {
+        font-variation-settings: "DSTN" 1000, "ROTN" 1000, "wght" 900;
     }
 
-    .l3 {
-        font-variation-settings: "wght" 600;
-    }
-
-    .l4 {
-        font-variation-settings: "wght" 700;
-    }
-
-    .l5{
-        font-variation-settings: "wght" 800;
+    .positive {
+        font-variation-settings: "DSTN" 0, "ROTN" 0, "wght" 450;
     }
 
 </style>
