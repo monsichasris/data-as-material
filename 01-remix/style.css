@@ -1,0 +1,14 @@
+nav {
+    position: fixed;
+    font-family: 'Courier New', Courier, monospace;
+    background-color: white;
+    z-index: 100;
+    display: flex;
+    flex-direction: row;
+    padding: 1rem;
+    gap: 1rem;
+    width: 100vw;
+    top: 0;
+    border-bottom: 2px solid black;
+
+}
