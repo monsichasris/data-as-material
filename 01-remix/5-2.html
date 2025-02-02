@@ -67,33 +67,19 @@
     </nav>
 
     <main>
-        <p><span class="f4">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>I think that you're great.</p>
-        <p><i>It's wonderful fun when you keep me up late.</i></p>
-        <p>I think you're the best when I'm totally stressed,</p>
-        <p><i>preparing and cramming all night for a test.</i></p>
-
-        <p><span class="f3">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>What more can I say?</p>
-        <p><i>I love to do hundreds of problems each day.</i></p>
-        <p>You boggle my mind and you make me go blind,</p>
-        <p><i>but still I'm ecstatic that you were assigned.</i></p>
+        <div class="poem" style="transform: rotate(3deg);">
+            <span class="space1">Homework,</span> I <span class="space2">love</span>you. I think that you're great. It's wonderful fun when you keep me up late. I think you're the best when I'm totally <span class="space3">stressed</span>, preparing and <span class="space3">cramming</span> all night for a test.
+        </div>
+        <div class="poem" style="transform: rotate(-2deg);">
+            <span class="space1">Homework,</span> I <span class="space2">love</span>you. What more can I say? I <span class="space2">love</span> to do hundreds of <span class="space3">problems</span> each day. You <span class="space3">boggle</span> my mind and you make me go blind, but still I'm ecstatic that you were assigned.
+        </div>
+        <div class="poem" style="transform: rotate(5deg); transform-origin: 0%;">
+            <span class="space1">Homework,</span> I <span class="space2">love</span>you. I tell you, it's true. There's nothing more fun or exciting to do. You're never a <span class="space3">chore,</span> for it's you I adore. I wish that our teacher would hand you out more.
+        </div>
+        <div class="poem" style="transform: rotate(-5deg); transform-origin: 120%;">
+            <span class="space1">Homework,</span> I <span class="space2">love</span>you. You thrill me inside. I'm filled with <span class="space3">emotions.</span> I'm fit to be tied. I cannot complain when you <span class="space2">frazzle</span> my brain. Of course, that's because <span class="space1">I'm completely insane.</span>
+        </div>
         
-        <p><span class="f2">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>I tell you, it's true.</p>
-        <p><i>There's nothing more fun or exciting to do.</i></p>
-        <p>You're never a chore, for it's you I adore.</p>
-        <p><i>I wish that our teacher would hand you out more.</i></p>
-        
-        <p><span class="f1">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>You thrill me inside.</p>
-        <p><i>I'm filled with emotions. I'm fit to be tied.</i></p>
-        <p>I cannot complain when you frazzle my brain.</p>
-        <p><i>Of course, that's because I'm completely insane.</i></p>
     </main>
 
     <footer>
@@ -105,20 +91,29 @@
 
 <style>
     main {
-        margin: 6rem 0 2rem 0;
+        margin: 8rem 2rem 12rem 2rem;
     }
 
-    p {
-        font-family: "thermal-variable", sans-serif;
-        font-variation-settings: 'opsz' 100, 'wght' 100;
-        font-size: 3rem;
-        margin: 0;
-        line-height: 80%;
-        text-align: center;
-    }
-
-    span{
+    .poem {
+        font-family: sudz-regular, sans-serif;
+        font-style: normal;
+        font-weight: 400;
         font-size: 6rem;
+        margin: 0;
+        line-height: 60%;
+        text-align: justify;
+    }
+
+    .space1 {
+        letter-spacing: 8px;
+    }
+
+    .space2 {
+        letter-spacing: 24px;
+    }
+
+    .space3 {
+        letter-spacing: -8px;
     }
 
 

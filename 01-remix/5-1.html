@@ -67,33 +67,17 @@
     </nav>
 
     <main>
-        <p><span class="f4">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>I think that you're great.</p>
-        <p><i>It's wonderful fun when you keep me up late.</i></p>
-        <p>I think you're the best when I'm totally stressed,</p>
-        <p><i>preparing and cramming all night for a test.</i></p>
-
-        <p><span class="f3">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>What more can I say?</p>
-        <p><i>I love to do hundreds of problems each day.</i></p>
-        <p>You boggle my mind and you make me go blind,</p>
-        <p><i>but still I'm ecstatic that you were assigned.</i></p>
+        <div class="poem">
+            <span style="font-weight: 200; font-size: 200px; vertical-align: bottom;">Homework,</span><span style="font-weight: 300; font-size: 200px; vertical-align: bottom;"><i>I love you.</i></span> <span style="font-weight: 400;">I think that</span> <span style="font-weight: 500;"><i>you're great.</i></span> <span style="font-weight: 600;">It's wonderful fun</span> <span style="font-weight: 700;">when you  <span style="font-weight: 800;">keep me</span> <span style="font-weight: 900;">up late.</span>
+            <span style="font-weight: 800;">I think</span> <span style="font-weight: 700;"><i>you're the best</i></span> <span style="font-weight: 600;">when I'm</span> <span style="font-weight: 500; font-size: 200px; vertical-align: bottom;">totally stressed,</span> <span style="font-weight: 400;">preparing and</span> <span style="font-weight: 300; font-size: 200px; vertical-align: bottom;">cramming all night</span> <span style="font-weight: 200;">for a test.</span> 
         
-        <p><span class="f2">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>I tell you, it's true.</p>
-        <p><i>There's nothing more fun or exciting to do.</i></p>
-        <p>You're never a chore, for it's you I adore.</p>
-        <p><i>I wish that our teacher would hand you out more.</i></p>
+            <span style="font-weight: 200;">Homework,</span><span style="font-weight: 300;"><i>I love you.</i></span> <span style="font-weight: 400;">What more</span> <span style="font-weight: 500;">can I say?</span> <span style="font-weight: 600;">I love to do</span> <span style="font-weight: 700; font-size: 200px; vertical-align: bottom;">hundreds of problems</span> <span style="font-weight: 800;">each day.</span>
+            <span style="font-weight: 900; font-size: 200px; vertical-align: bottom;">You boggle</span> <span style="font-weight: 800;">my mind</span> <span style="font-weight: 700;">and you</span> <span style="font-weight: 600;">make me</span> <span style="font-weight: 500;">go blind,</span> <span style="font-weight: 400;">but still</span> <span style="font-weight: 300;"><i>I'm ecstatic</i></span> <span style="font-weight: 200;">that you</span> <span style="font-weight: 300;">were assigned.</span>
         
-        <p><span class="f1">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>You thrill me inside.</p>
-        <p><i>I'm filled with emotions. I'm fit to be tied.</i></p>
-        <p>I cannot complain when you frazzle my brain.</p>
-        <p><i>Of course, that's because I'm completely insane.</i></p>
+            <span style="font-weight: 400;">Homework,</span> <span style="font-weight: 500;"><i>I love you.</i></span> <span style="font-weight: 600;">I tell you,</span> <span style="font-weight: 700;">it's true.</span> <span style="font-weight: 800; font-size: 200px; vertical-align: bottom;">There's nothing</span> <span style="font-weight: 900;"><i>more fun or exciting to do.</i></span> <span style="font-weight: 800;">You're never</span> <span style="font-weight: 700; font-size: 200px; vertical-align: bottom;">a chore,</span> <span style="font-weight: 600;">for it's you</span> <span style="font-weight: 500;">I adore.</span> <span style="font-weight: 400;">I wish that</span> <span style="font-weight: 300;">our teacher</span> <span style="font-weight: 200;">would hand you</span> <span style="font-weight: 300;"><i>out more.</i></span>
+        
+            <span style="font-weight: 400;">Homework,</span> <span style="font-weight: 500;"><i>I love you.</i></span> <span style="font-weight: 600; font-size: 200px; vertical-align: bottom;">You thrill me</span> <span style="font-weight: 700;">inside.</span> <span style="font-weight: 800;">I'm filled</span> <span style="font-weight: 900;">with emotions.</span> <span style="font-weight: 800;">I'm fit</span> <span style="font-weight: 700; font-size: 200px; vertical-align: bottom;">to be tied.</span> <span style="font-weight: 600;">I cannot</span> <span style="font-weight: 500;">complain</span> <span style="font-weight: 400;">when you</span> <span style="font-weight: 300; font-size: 200px; vertical-align: bottom;">frazzle my brain.</span> <span style="font-weight: 200;">Of course,</span> <span style="font-weight: 300;">that's because</span> <span style="font-weight: 400;">I'm completely</span> <span style="font-weight: 500; font-size: 200px; vertical-align: bottom;">insane.</span>
+        </div>
     </main>
 
     <footer>
@@ -105,21 +89,28 @@
 
 <style>
     main {
-        margin: 6rem 0 2rem 0;
+        margin: 4rem 0 2rem 0;
     }
 
-    p {
-        font-family: "thermal-variable", sans-serif;
-        font-variation-settings: 'opsz' 100, 'wght' 100;
-        font-size: 3rem;
+    .poem {
+        font-family: "origin-super-condensed", sans-serif;
+        font-size: 300px;
         margin: 0;
-        line-height: 80%;
+        line-height: 24px;
+        text-transform: uppercase;
         text-align: center;
+        letter-spacing: -10;
+        text-align: justify;
     }
 
     span{
         font-size: 6rem;
     }
+
+    /* footer {
+        position: fixed;
+        width: 98%;
+    } */
 
 
 </style>

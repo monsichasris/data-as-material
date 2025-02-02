@@ -67,33 +67,30 @@
     </nav>
 
     <main>
-        <p><span class="f4">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>I think that you're great.</p>
-        <p><i>It's wonderful fun when you keep me up late.</i></p>
-        <p>I think you're the best when I'm totally stressed,</p>
-        <p><i>preparing and cramming all night for a test.</i></p>
-
-        <p><span class="f3">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>What more can I say?</p>
-        <p><i>I love to do hundreds of problems each day.</i></p>
-        <p>You boggle my mind and you make me go blind,</p>
-        <p><i>but still I'm ecstatic that you were assigned.</i></p>
-        
-        <p><span class="f2">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>I tell you, it's true.</p>
-        <p><i>There's nothing more fun or exciting to do.</i></p>
-        <p>You're never a chore, for it's you I adore.</p>
-        <p><i>I wish that our teacher would hand you out more.</i></p>
-        
-        <p><span class="f1">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>You thrill me inside.</p>
-        <p><i>I'm filled with emotions. I'm fit to be tied.</i></p>
-        <p>I cannot complain when you frazzle my brain.</p>
-        <p><i>Of course, that's because I'm completely insane.</i></p>
+        <div class="poem">
+            Homework, I love you. I think that you're great.
+            <span class="f2">It's wonderful fun when you keep me up late.</span>
+            I think you're the best when I'm totally <span style="letter-spacing: 16px;">stressed</span>,
+            <span class="f1">preparing and cramming all night for a test.</span>
+        </div>
+        <div class="poem">
+            Homework, I love you. What more can I say?
+            <span class="f2">I love to do hundreds of problems each day.</span>
+            You boggle my mind and you make me go blind,
+            <span class="f1">but still I'm ecstatic that you were <span style="letter-spacing: 5rem;">assigned.</span></span>
+        </div>
+        <div class="poem">
+            Homework, I love you. I tell you, it's true.
+            <span class="f2">There's nothing more fun or exciting to do.</span>
+            You're never a chore, for it's you I adore.
+            <span class="f1">I wish that our teacher would hand you <span style="letter-spacing: 4rem;">out more</span>.
+        </div>
+        <div class="poem">
+            Homework, I love you. You thrill me inside.
+            <span class="f2">I'm filled with emotions. I'm fit to be tied.
+            I cannot complain when you frazzle my brain.
+            <span class="f1">Of course, that's because I'm <span style="letter-spacing: 1rem;">completely</span> insane.
+        </div>
     </main>
 
     <footer>
@@ -106,19 +103,32 @@
 <style>
     main {
         margin: 6rem 0 2rem 0;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
-    p {
-        font-family: "thermal-variable", sans-serif;
-        font-variation-settings: 'opsz' 100, 'wght' 100;
-        font-size: 3rem;
-        margin: 0;
+    .poem {
+        display: inline-block;
+        font-family: "elliotts-blue-eyeshadow", sans-serif;
+        font-size: 4rem;
         line-height: 80%;
-        text-align: center;
+        text-align: justify;
+        text-align-last: justify;
+        width: 60%;
     }
 
-    span{
-        font-size: 6rem;
+    .f1 {
+        font-family: "valnera-variable", sans-serif;
+        font-variation-settings: "DSTN" 1000, "ROTN" 1000, "wght" 400;
+        letter-spacing: 0.5rem;
+    }
+
+    .f2{
+        font-family: "ds-ddungsang-variable", sans-serif;
+        font-variation-settings: "wght" 900;
+        letter-spacing: 0.2rem;
     }
 
 

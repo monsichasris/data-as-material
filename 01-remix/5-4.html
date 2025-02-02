@@ -67,33 +67,31 @@
     </nav>
 
     <main>
-        <p><span class="f4">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>I think that you're great.</p>
-        <p><i>It's wonderful fun when you keep me up late.</i></p>
-        <p>I think you're the best when I'm totally stressed,</p>
-        <p><i>preparing and cramming all night for a test.</i></p>
+        <div class="poem" style="transform: rotate(2deg);">
+        Homework, I <span class="word1">love</span> you.<br>
+        I think that you're <span class="word1">great.</span><br>
+        It's <span class="word1">wonderful</span> fun when you keep me up <span class="word2">late.</span><br>
+        I think you're the <span class="word1">best</span> when I'm totally <span class="word2">stressed,</span><br>
+        preparing and <span class="word2">crammin</span> all night for a test.<br>
 
-        <p><span class="f3">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>What more can I say?</p>
-        <p><i>I love to do hundreds of problems each day.</i></p>
-        <p>You boggle my mind and you make me go blind,</p>
-        <p><i>but still I'm ecstatic that you were assigned.</i></p>
+        Homework, I <span class="word1">love</span> you.<br>
+        What more can I say?<br>
+        I <span class="word1">love</span> to do hundreds of <div style="transform: rotate(-10deg);"><span class="word2">problems</span></div> each day.<br>
+        You <span class="word2">boggle</span> my mind and you make me go blind,<br>
+        but still I'm <span class="word1">ecstatic</span> that you were assigned.<br>
         
-        <p><span class="f2">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>I tell you, it's true.</p>
-        <p><i>There's nothing more fun or exciting to do.</i></p>
-        <p>You're never a chore, for it's you I adore.</p>
-        <p><i>I wish that our teacher would hand you out more.</i></p>
-        
-        <p><span class="f1">Homework,</span></p> 
-        <p><i>I love you.</i></p>
-        <p>You thrill me inside.</p>
-        <p><i>I'm filled with emotions. I'm fit to be tied.</i></p>
-        <p>I cannot complain when you frazzle my brain.</p>
-        <p><i>Of course, that's because I'm completely insane.</i></p>
+        Homework, I <span class="word1">love</span> you.<br>
+        I tell you, it's <span class="word1"></span>true.<br>
+        There's nothing more <span class="word1">fun</span> or <span class="word1">exciting</span> to do.<br>
+        You're never a <span class="word2">chore</span>, for it's you I <span class="word1">adore.</span><br>
+        I wish that our teacher would hand you out more.<br>
+
+        Homework, I <span class="word1">love</span> you.<br>
+        You thrill me inside.<br>
+        I'm filled with <div style="transform: rotate(5deg);"><span class="word2">emotions.</span></div> I'm fit to be tied.<br>
+        I cannot complain when you <span class="word2">frazzle</span> my brain.<br>
+        Of course, that's because I'm completely <span class="word2">insane.</span>
+        </div>
     </main>
 
     <footer>
@@ -105,20 +103,34 @@
 
 <style>
     main {
-        margin: 6rem 0 2rem 0;
+        margin: 6rem 0 3rem 0;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
-    p {
+    .poem {
         font-family: "thermal-variable", sans-serif;
         font-variation-settings: 'opsz' 100, 'wght' 100;
-        font-size: 3rem;
+        font-size: 1rem;
         margin: 0;
-        line-height: 80%;
-        text-align: center;
+        line-height: 120%;
+        text-align: justify;
+        text-align-last: justify;
+        width: 96%;
     }
 
-    span{
+   .word1 {
+        font-variation-settings: 'opsz' 100, 'wght' 900;
+        font-size: 2rem;
+        letter-spacing: 6rem;
+    }
+
+    .word2 {
+        font-variation-settings: 'opsz' 900, 'wght' 100;
         font-size: 6rem;
+        letter-spacing: 8rem;
     }
 
 </style>
