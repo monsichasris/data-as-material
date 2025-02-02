@@ -67,25 +67,25 @@
     </nav>
 
     <main>
-        <p>Homework, I love you. I think that you're great.</p>
-        <p>It's wonderful fun when you keep me up late.</p>
-        <p>I think you're the best when I'm totally stressed,</p>
-        <p>preparing and cramming all night for a test.</p>
+        <div class="text">Homework, I love you. I think that you're great.
+        It's wonderful fun when you keep me up late.
+        I think you're the best when I'm totally stressed,
+        preparing and cramming all night for a test.</div>
 
-        <p>Homework, I love you. What more can I say?</p>
-        <p>I love to do hundreds of problems each day.</p>
-        <p>You boggle my mind and you make me go blind,</p>
-        <p>but still I'm ecstatic that you were assigned.</p>
+        <div class="text" style="transform-origin: 0% 40%; transform: rotate(90deg); left: 75%;">Homework, I love you. What more can I say?
+        I love to do hundreds of problems each day.
+        You boggle my mind and you make me go blind,
+        but still I'm ecstatic that you were assigned.</div>
         
-        <p>Homework, I love you. I tell you, it's true.</p>
-        <p>There's nothing more fun or exciting to do.</p>
-        <p>You're never a chore, for it's you I adore.</p>
-        <p>I wish that our teacher would hand you out more.</p>
+        <div class="text" style="top: 80%;">Homework, I love you. I tell you, it's true.
+        There's nothing more fun or exciting to do.
+        You're never a chore, for it's you I adore.
+        I wish that our teacher would hand you out more.</div>
         
-        <p>Homework, I love you. You thrill me inside.</p>
-        <p>I'm filled with emotions. I'm fit to be tied.</p>
-        <p>I cannot complain when you frazzle my brain.</p>
-        <p>Of course, that's because I'm completely insane.</p>
+        <div class="text" style="transform-origin: 100% 40%; transform: rotate(-90deg); left: -15%;">Homework, I love you. You thrill me inside.
+        I'm filled with emotions. I'm fit to be tied.
+        I cannot complain when you frazzle my brain.
+        Of course, that's because I'm completely insane.</div>
     </main>
 
     <footer>
@@ -97,14 +97,24 @@
 
 <style>
     main {
-        margin: 5.8rem 0 1.2rem 1.2rem;
+        margin: 8rem 0 0 0;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
     }
 
-    p {
+    .text {
         font-family: "thermal-variable", sans-serif;
-        font-size: 4rem;
+        font-size: 1.5rem;
         margin: 0;
-        line-height: 80%;
+        line-height: 100%;
+        position: absolute;
+        width: 40%;
+        text-align: center;
+    }
+    footer{
+        position: fixed;
+        width: 98%;
     }
 
 </style>
