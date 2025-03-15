@@ -1,4 +1,5 @@
-const STATION_STOP_ID = "635N"; // Change this to your station's stop_id
+
+const STATION_STOP_ID = "635N";
 const MTA_GTFS_URL = "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs";
 
 async function fetchGTFS() {
@@ -9,26 +10,24 @@ async function fetchGTFS() {
         const response = await fetch(MTA_GTFS_URL);
         const data = await response.arrayBuffer();
       
-
         // Load protobuf schema
         const root = await protobuf.load("https://raw.githubusercontent.com/google/transit/master/gtfs-realtime/proto/gtfs-realtime.proto");
         const FeedMessage = root.lookupType("transit_realtime.FeedMessage");
 
         // Decode GTFS-RT data
         const message = FeedMessage.decode(new Uint8Array(data));
-        console.log("Decoded GTFS-RT data:", message);
 
         // Extract real-time arrivals
         let arrivals = extractStationArrivals(message, STATION_STOP_ID);
-        console.log("Arrivals:", arrivals);
-        
 
         // Update the table
         updateTable(arrivals);
+
+        return message;
+        
     } catch (error) {
         console.error("Error fetching GTFS data:", error);
-        document.getElementById("train-arrivals").innerHTML = `<tr><td colspan="2">Error loading data.</td></tr>`;
-    }
+    }    
 
     document.getElementById("status").innerText = `Last updated: ${new Date().toLocaleTimeString()}`;
 }
@@ -41,13 +40,15 @@ function extractStationArrivals(message, stopId) {
             entity.tripUpdate.stopTimeUpdate.forEach(update => {
                 if (update.stopId === stopId && new Date().toLocaleTimeString() < new Date(update.arrival.time * 1000).toLocaleTimeString()) {
                     let arrivalTime = new Date(update.arrival.time * 1000); // Convert Unix timestamp
-                    // console.log("Route:", entity.tripUpdate.trip.routeId || "Unknown", "Arrival Time:", arrivalTime);
 
                     arrivals.push({
+                        id: entity.id,
                         route: entity.tripUpdate.trip.routeId || "Unknown",
                         arrival: arrivalTime
                     });
+                    
                 }
+                // console.log(arrivals);
             });
         }
     });
@@ -76,46 +77,91 @@ function updateTable(arrivals) {
 
 let trainPositions = {};  // Store the positions of the trains
 
-// Function to update the train positions based on the route and arrival time
-function updateTrainPosition(route, arrivalTime) {
-    const routeLine = document.getElementById(`route-${route}`);  // Get the route line
-    const circle = document.getElementById(`train-${route}`);  // Get the corresponding circle
-    const currentTime = new Date().getTime() / 1000;  // Get the current time in seconds
-    const timeRemaining = arrivalTime - currentTime;  // Calculate the time remaining for the train
+function updateTrainPosition(id, route, arrivalTime) {
 
-    if (timeRemaining <= 0) {
-        return;  // If the train has already arrived, don't update
+    let circle = d3.select(`#train-${id}`);
+    if (circle.empty()) {
+        circle = d3.select('svg').append('circle')
+            .attr('id', `train-${id}`)
+            .attr('r', 20) 
+            .attr('cy', () => {
+                switch (route) {
+                    case '4':
+                        return 50;
+                    case '5':
+                        return 100;
+                    case '6':
+                        return 150;
+                    default:
+                        return 200;  // Default position for other routes
+                }
+            })
+            .attr('fill', () => {
+                switch (route) {
+                    case '4':
+                        return '#00933C'; // green
+                    case '5':
+                        return 'yellow';
+                    case '6':
+                        return 'blue';
+                    default:
+                        return 'red';  // Default color for other routes
+                }
+            });
+        trainPositions[id] = 0;
     }
 
-    // Position the circle based on the time remaining (this is just an example logic)
-    const position = 1280 * (1 - (timeRemaining / 300));  // Assuming 300 seconds as the max travel time (just an example)
+    const currentTime = new Date().getTime() / 1000;
+    const timeRemaining = arrivalTime - currentTime;  // Calculate time remaining for train arrival
 
-    // Update the circle position (cx attribute for horizontal movement)
-    circle.setAttribute('cx', position);
+    const maxTravelTime = 300; // 3 minutes max travel time
+    const maxWidth = window.innerWidth;
+
+    // D3 scale: Map time remaining to position along the route
+    const xScale = d3.scaleLinear()
+        .domain([maxTravelTime, 0])  // Time range (0 = arrival, maxTravelTime = farthest away)
+        .range([maxWidth, 0]);
+
+    // Compute new position
+    const position = xScale(Math.max(0, timeRemaining));
+
+    const positionPercentage = (position / maxWidth) * 100;
+
+    console.log(`Route: ${route}, Time Remaining: ${timeRemaining.toFixed(2)}, Position: ${position}`);
+
+    // Update the circle position using D3 transition for smooth movement
+    circle.transition()
+        .duration(1000)  // Smooth movement every second
+        .ease(d3.easeLinear)  // Keep linear movement
+        .attr('cx', positionPercentage); // Update the x position of the circle
+    trainPositions[id] = position;
 }
 
+
+
 // Function to update all trains in real-time
-function updateTrains(arrivals) {
+function updateTrains(message, arrivals) {
+    console.log('updateTrains called with arrivals:', arrivals);
     arrivals.forEach(train => {
         // Call updateTrainPosition for each train in the arrivals array
-        updateTrainPosition(train.route, train.arrival.getTime() / 1000);  // Convert arrival time to Unix timestamp (seconds)
+        updateTrainPosition(train.id, train.route, train.arrival.getTime() / 1000);  // Convert arrival time to Unix timestamp (seconds)
+        console.log(train.route, train.arrival.getTime() / 1000);
     });
 }
 
-// Sample data structure for arrivals
-const arrivals = [
-    { route: 1, arrival: new Date(Date.now() + 5000) },  // Train arriving in 5 seconds
-    { route: 2, arrival: new Date(Date.now() + 10000) }, // Train arriving in 10 seconds
-    { route: 3, arrival: new Date(Date.now() + 15000) }  // Train arriving in 15 seconds
-];
-
-// Start the real-time updates (this would normally come from GTFS-RT feed)
-setInterval(() => {
-    updateTrains(arrivals);
-}, 1000);  // Update every second
+// Start the real-time updates using the feed data
+setInterval(async () => {
+    console.log('Fetching GTFS data...');
+    const message = await fetchGTFS();  // Fetch GTFS data
+    if (message) {  // Ensure data is valid
+        const arrivals = extractStationArrivals(message, STATION_STOP_ID);
+        console.log('Extracted arrivals:', arrivals);
+        updateTrains(message, arrivals);  // Call update function with data
+    }
+}, 1000);   // Update every second
 
 
 window.onload = function () {
     fetchGTFS(); // Initial fetch
-    setInterval(fetchGTFS, 30000); // Refresh every 30 sec
+    setInterval(fetchGTFS, 10000); // Refresh every 10 sec
 };

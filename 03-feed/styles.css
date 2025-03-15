@@ -2,6 +2,15 @@
     font-family: helvetica, sans-serif;
 }
 
+body {
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    margin: 0;
+}
+
 /* circle {
     transition: cx 1s linear; 
 } */
