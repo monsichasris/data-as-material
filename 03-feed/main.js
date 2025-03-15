@@ -23,6 +23,11 @@ async function fetchGTFS() {
         // Update the table
         updateTable(arrivals);
 
+        // Update train positions
+        arrivals.forEach(train => {
+            updateTrainPosition(train.id, train.route, train.arrival.getTime() / 1000);  // Convert arrival time to Unix timestamp (seconds)
+        });
+
         return message;
         
     } catch (error) {
@@ -42,7 +47,8 @@ function extractStationArrivals(message, stopId) {
                     let arrivalTime = new Date(update.arrival.time * 1000); // Convert Unix timestamp
 
                     arrivals.push({
-                        id: entity.id,
+                        // id: entity.id,
+                        id: entity.tripUpdate.trip.tripId.replace(/\./g, "-"),
                         route: entity.tripUpdate.trip.routeId || "Unknown",
                         arrival: arrivalTime
                     });
@@ -78,9 +84,9 @@ function updateTable(arrivals) {
 let trainPositions = {};  // Store the positions of the trains
 
 function updateTrainPosition(id, route, arrivalTime) {
-
     let circle = d3.select(`#train-${id}`);
     if (circle.empty()) {
+        console.log(`Creating new circle for trainId: ${id}`);
         circle = d3.select('svg').append('circle')
             .attr('id', `train-${id}`)
             .attr('r', 20) 
@@ -114,49 +120,38 @@ function updateTrainPosition(id, route, arrivalTime) {
     const currentTime = new Date().getTime() / 1000;
     const timeRemaining = arrivalTime - currentTime;  // Calculate time remaining for train arrival
 
-    const maxTravelTime = 300; // 3 minutes max travel time
+    const maxTravelTime = 100; // 3 minutes max travel time
     const maxWidth = window.innerWidth;
 
     // D3 scale: Map time remaining to position along the route
     const xScale = d3.scaleLinear()
-        .domain([maxTravelTime, 0])  // Time range (0 = arrival, maxTravelTime = farthest away)
-        .range([maxWidth, 0]);
+        .domain([0, maxTravelTime])  // Time range (0 = arrival, maxTravelTime = farthest away)
+        .range([0,maxWidth]);
 
     // Compute new position
     const position = xScale(Math.max(0, timeRemaining));
 
     const positionPercentage = (position / maxWidth) * 100;
 
-    console.log(`Route: ${route}, Time Remaining: ${timeRemaining.toFixed(2)}, Position: ${position}`);
-
-    // Update the circle position using D3 transition for smooth movement
-    circle.transition()
-        .duration(1000)  // Smooth movement every second
-        .ease(d3.easeLinear)  // Keep linear movement
+    console.log(`Route: ${route}, Id: ${id}, Time Remaining: ${timeRemaining.toFixed(2)}, Position: ${position}`);
+    
+    circle
+        // .transition()
+        // .duration(1000)  // Smooth movement every second
+        // .ease(d3.easeLinear)  // Keep linear movement
         .attr('cx', positionPercentage); // Update the x position of the circle
     trainPositions[id] = position;
 }
 
 
-
-// Function to update all trains in real-time
-function updateTrains(message, arrivals) {
-    console.log('updateTrains called with arrivals:', arrivals);
-    arrivals.forEach(train => {
-        // Call updateTrainPosition for each train in the arrivals array
-        updateTrainPosition(train.id, train.route, train.arrival.getTime() / 1000);  // Convert arrival time to Unix timestamp (seconds)
-        console.log(train.route, train.arrival.getTime() / 1000);
-    });
-}
-
 // Start the real-time updates using the feed data
 setInterval(async () => {
-    console.log('Fetching GTFS data...');
     const message = await fetchGTFS();  // Fetch GTFS data
     if (message) {  // Ensure data is valid
         const arrivals = extractStationArrivals(message, STATION_STOP_ID);
-        console.log('Extracted arrivals:', arrivals);
-        updateTrains(message, arrivals);  // Call update function with data
+        arrivals.forEach(train => {
+            updateTrainPosition(train.id, train.route, train.arrival.getTime() / 1000);  // Convert arrival time to Unix timestamp (seconds)
+        });
     }
 }, 1000);   // Update every second
 
