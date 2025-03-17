@@ -1,6 +1,34 @@
 
-const STATION_STOP_ID = "635N";
+let STATION_STOP_ID = "635"; // Default stop ID (14 St-Union Sq: downtown)
+let DIRECTION = "S"; // Default direction (downtown)
 const MTA_GTFS_URL = "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs";
+
+// Load stations from JSON file and populate dropdown menu
+async function loadStations() {
+    try {
+        const response = await fetch('stations.json');
+        const stations = await response.json();
+        populateDropdown(stations);
+    } catch (error) {
+        console.error("Error loading stations:", error);
+    }
+}
+
+// Populate dropdown menu with stations
+function populateDropdown(stations) {
+    const dropdown = document.getElementById('station-select');
+    const stationArray = Object.entries(stations).sort((a, b) => a[1].name.localeCompare(b[1].name));
+    for (const [id, station] of stationArray) {
+        const option = document.createElement('option');
+        option.value = id;
+        option.text = station.name;
+        if (id === STATION_STOP_ID) {
+            option.selected = true; // Set the default selection
+        }
+        dropdown.add(option);
+    }
+}
+
 
 async function fetchGTFS() {
     document.getElementById("status").innerText = "Updating..."; // Show update message
@@ -18,14 +46,14 @@ async function fetchGTFS() {
         const message = FeedMessage.decode(new Uint8Array(data));
 
         // Extract real-time arrivals
-        let arrivals = extractStationArrivals(message, STATION_STOP_ID);
+        let arrivals = extractStationArrivals(message, STATION_STOP_ID + DIRECTION);
 
         // Update the table
         updateTable(arrivals);
 
         // Update train positions
         arrivals.forEach(train => {
-            updateTrainPosition(train.id, train.route, train.arrival.getTime() / 1000);  // Convert arrival time to Unix timestamp (seconds)
+            updateTrain(train.id, train.route, train.arrival.getTime() / 1000);  // Convert arrival time to Unix timestamp (seconds)
         });
 
         return message;
@@ -83,8 +111,9 @@ function updateTable(arrivals) {
 
 let trainPositions = {};  // Store the positions of the trains
 
-function updateTrainPosition(id, route, arrivalTime) {
+function updateTrain(id, route, arrivalTime) {
     let circle = d3.select(`#train-${id}`);
+    let text = d3.select(`#text-${id}`);
     if (circle.empty()) {
         console.log(`Creating new circle for trainId: ${id}`);
         circle = d3.select('svg').append('circle')
@@ -114,14 +143,16 @@ function updateTrainPosition(id, route, arrivalTime) {
                                 return '#00933C'; // green for 456 lines
                         }
                     });
-
-        d3.select('circle').append('text')
-                    .attr('x', circle.attr('cx'))
-                    .attr('y', circle.attr('cy'))
-                    .attr('dy', '.35em')
-                    .attr('text-anchor', 'middle')
-                    .attr('fill', 'white')
-                    .text(route);
+                    text = d3.select('svg').append('text')
+                            .attr('id', `text-${id}`)
+                            .attr('y', circle.attr('cy'))
+                            .attr('dy', '.35em')
+                            .attr('text-anchor', 'middle')
+                            .attr('fill', 'white')
+                            .style('font-family', 'Helvetica')
+                            .style('font-weight', 'bold')
+                            .style('font-size', '20px')
+                            .text(route);
         trainPositions[id] = 0;
     }
 
@@ -138,14 +169,9 @@ function updateTrainPosition(id, route, arrivalTime) {
 
     // Compute new position
     const position = xScale(Math.max(0, timeRemaining));
-
-    console.log(`Route: ${route}, Id: ${id}, Time Remaining: ${timeRemaining.toFixed(2)}, Position: ${position.toFixed(2)}`);
     
-    circle
-        // .transition()
-        // .duration(1000)  // Smooth movement every second
-        // .ease(d3.easeLinear)  // Keep linear movement
-        .attr('cx', timeRemaining); // Update the x position of the circle
+    circle.attr('cx', timeRemaining); // Update the x position of the circle
+    text.attr('x', `${timeRemaining}`); // Update the x position
 
     // Play sound if the position is 0
     if (timeRemaining < 1) {
@@ -153,6 +179,8 @@ function updateTrainPosition(id, route, arrivalTime) {
     }
 
     trainPositions[id] = position;
+    
+    // console.log(`Route: ${route}, Id: ${id}, Time Remaining: ${timeRemaining.toFixed(2)}, Position: ${position.toFixed(2)}`);
 }
 
 
@@ -166,15 +194,26 @@ function playSound() {
 setInterval(async () => {
     const message = await fetchGTFS();  // Fetch GTFS data
     if (message) {  // Ensure data is valid
-        const arrivals = extractStationArrivals(message, STATION_STOP_ID);
+        const arrivals = extractStationArrivals(message, STATION_STOP_ID+DIRECTION);
         arrivals.forEach(train => {
-            updateTrainPosition(train.id, train.route, train.arrival.getTime() / 1000);  // Convert arrival time to Unix timestamp (seconds)
+            updateTrain(train.id, train.route, train.arrival.getTime() / 1000);  // Convert arrival time to Unix timestamp (seconds)
         });
     }
 }, 1000);   // Update every second
 
 
 window.onload = function () {
+    loadStations(); 
     fetchGTFS(); // Initial fetch
     setInterval(fetchGTFS, 10000); // Refresh every 10 sec
-};
+
+    document.getElementById('station-select').addEventListener('change', function() {
+        STATION_STOP_ID = this.value;
+        fetchGTFS(); // Fetch data for the selected station
+    });
+
+    document.getElementById('direction-select').addEventListener('change', function() {
+        DIRECTION = this.value;
+        fetchGTFS(); // Fetch data for the selected direction
+    });
+}
