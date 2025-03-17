@@ -6,7 +6,7 @@ const MTA_GTFS_URL = "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyc
 // Load stations from JSON file and populate dropdown menu
 async function loadStations() {
     try {
-        const response = await fetch('stations.json');
+        const response = await fetch('./assets/stations.json');
         const stations = await response.json();
         populateDropdown(stations);
     } catch (error) {
@@ -223,7 +223,7 @@ function updateTrain(id, route, arrivalTime, arrivals) {
 
 
 function playSound() {
-    var audio = new Audio('pew.mp3');
+    var audio = new Audio('./assets/pew.mp3');
     audio.play();
 }
 
