@@ -88,32 +88,40 @@ function updateTrainPosition(id, route, arrivalTime) {
     if (circle.empty()) {
         console.log(`Creating new circle for trainId: ${id}`);
         circle = d3.select('svg').append('circle')
-            .attr('id', `train-${id}`)
-            .attr('r', 20) 
-            .attr('cy', () => {
-                switch (route) {
-                    case '4':
-                        return 50;
-                    case '5':
-                        return 100;
-                    case '6':
-                        return 150;
-                    default:
-                        return 200;  // Default position for other routes
-                }
-            })
-            .attr('fill', () => {
-                switch (route) {
-                    case '4':
-                        return '#00933C'; // green
-                    case '5':
-                        return 'yellow';
-                    case '6':
-                        return 'blue';
-                    default:
-                        return 'red';  // Default color for other routes
-                }
-            });
+                    .attr('id', `train-${id}`)
+                    .attr('r', 20) 
+                    .attr('cy', () => {
+                        switch (route) {
+                            case '4':
+                                return 50;
+                            case '5':
+                                return 100;
+                            case '6':
+                                return 150;
+                            default:
+                                return 200;
+                        }
+                    })
+                    .attr('fill', () => {
+                        switch (route) {
+                            // case '4':
+                            //     return 'red';
+                            // case '5':
+                            //     return 'yellow';
+                            // case '6':
+                            //     return 'blue';
+                            default:
+                                return '#00933C'; // green for 456 lines
+                        }
+                    });
+
+        d3.select('circle').append('text')
+                    .attr('x', circle.attr('cx'))
+                    .attr('y', circle.attr('cy'))
+                    .attr('dy', '.35em')
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', 'white')
+                    .text(route);
         trainPositions[id] = 0;
     }
 
@@ -131,16 +139,26 @@ function updateTrainPosition(id, route, arrivalTime) {
     // Compute new position
     const position = xScale(Math.max(0, timeRemaining));
 
-    const positionPercentage = (position / maxWidth) * 100;
-
-    console.log(`Route: ${route}, Id: ${id}, Time Remaining: ${timeRemaining.toFixed(2)}, Position: ${position}`);
+    console.log(`Route: ${route}, Id: ${id}, Time Remaining: ${timeRemaining.toFixed(2)}, Position: ${position.toFixed(2)}`);
     
     circle
         // .transition()
         // .duration(1000)  // Smooth movement every second
         // .ease(d3.easeLinear)  // Keep linear movement
-        .attr('cx', positionPercentage); // Update the x position of the circle
+        .attr('cx', timeRemaining); // Update the x position of the circle
+
+    // Play sound if the position is 0
+    if (timeRemaining < 1) {
+        playSound();
+    }
+
     trainPositions[id] = position;
+}
+
+
+function playSound() {
+    var audio = new Audio('pew.mp3');
+    audio.play();
 }
 
 
