@@ -31,8 +31,6 @@ function populateDropdown(stations) {
 
 
 async function fetchGTFS() {
-    document.getElementById("status").innerText = "Updating..."; // Show update message
-
     try {
         // Fetch GTFS-RT feed
         const response = await fetch(MTA_GTFS_URL);
@@ -53,7 +51,7 @@ async function fetchGTFS() {
 
         // Update train positions
         arrivals.forEach(train => {
-            updateTrain(train.id, train.route, train.arrival.getTime() / 1000);  // Convert arrival time to Unix timestamp (seconds)
+            updateTrain(train.id, train.route, train.arrival.getTime() / 1000, arrivals);  
         });
 
         return message;
@@ -62,7 +60,7 @@ async function fetchGTFS() {
         console.error("Error fetching GTFS data:", error);
     }    
 
-    document.getElementById("status").innerText = `Last updated: ${new Date().toLocaleTimeString()}`;
+    // document.getElementById("status").innerText = `Last updated: ${new Date().toLocaleTimeString()}`;
 }
 
 function extractStationArrivals(message, stopId) {
@@ -111,48 +109,80 @@ function updateTable(arrivals) {
 
 let trainPositions = {};  // Store the positions of the trains
 
-function updateTrain(id, route, arrivalTime) {
+function updateTrain(id, route, arrivalTime, arrivals) {
+
+    // Remove old lines
+    d3.selectAll('line').remove();
+
+    const svg = d3.select('svg');
+    const routes = [...new Set(arrivals.map(train => train.route))];
+
+    routes.forEach((route, index) => {
+        console.log(`Creating new line for route: ${route}, index: ${index}`);
+        svg.append('line')
+            .attr('id', `route-${route}`)
+            .attr('x1', 0)
+            .attr('y1', 50 + index * 50)
+            .attr('x2', window.innerWidth)
+            .attr('y2', 50 + index * 50)
+            .attr('stroke', '#000')
+            .attr('stroke-width', 2)
+            .lower();
+    });
+
+    const activeTrainIds = new Set(arrivals.map(train => train.id));
+
+    // Hide or remove circles and text not in the current arrivals
+    d3.selectAll('circle').each(function() {
+        const circle = d3.select(this);
+        const id = circle.attr('id').replace('train-', '');
+        if (!activeTrainIds.has(id)) {
+            circle.remove();
+        }
+    });
+
+    d3.selectAll('text').each(function() {
+        const text = d3.select(this);
+        const id = text.attr('id').replace('text-', '');
+        if (!activeTrainIds.has(id)) {
+            text.remove();
+        }
+    });
+    
     let circle = d3.select(`#train-${id}`);
     let text = d3.select(`#text-${id}`);
     if (circle.empty()) {
-        console.log(`Creating new circle for trainId: ${id}`);
+        // console.log(`Creating new circle for trainId: ${id}`);
         circle = d3.select('svg').append('circle')
                     .attr('id', `train-${id}`)
                     .attr('r', 20) 
-                    .attr('cy', () => {
-                        switch (route) {
-                            case '4':
-                                return 50;
-                            case '5':
-                                return 100;
-                            case '6':
-                                return 150;
-                            default:
-                                return 200;
-                        }
-                    })
+                    .attr('cy', 50 + routes.indexOf(route) * 50)
                     .attr('fill', () => {
                         switch (route) {
-                            // case '4':
-                            //     return 'red';
-                            // case '5':
-                            //     return 'yellow';
-                            // case '6':
-                            //     return 'blue';
-                            default:
+                            case '4':
+                            case '5':
+                            case '6':
                                 return '#00933C'; // green for 456 lines
+                            case '1':
+                            case '2':
+                            case '3':
+                                return '#EE352E'; // red for 123 lines
+                            case '7':
+                                return '#B933AD'; // purple for 7 line
+                            default:
+                                return '#808183'; // default color
                         }
                     });
-                    text = d3.select('svg').append('text')
-                            .attr('id', `text-${id}`)
-                            .attr('y', circle.attr('cy'))
-                            .attr('dy', '.35em')
-                            .attr('text-anchor', 'middle')
-                            .attr('fill', 'white')
-                            .style('font-family', 'Helvetica')
-                            .style('font-weight', 'bold')
-                            .style('font-size', '20px')
-                            .text(route);
+        text = d3.select('svg').append('text')
+                        .attr('id', `text-${id}`)
+                        .attr('y', circle.attr('cy'))
+                        .attr('dy', '.35em')
+                        .attr('text-anchor', 'middle')
+                        .attr('fill', 'white')
+                        .style('font-family', 'Helvetica')
+                        .style('font-weight', 'bold')
+                        .style('font-size', '20px')
+                        .text(route);
         trainPositions[id] = 0;
     }
 
@@ -170,8 +200,8 @@ function updateTrain(id, route, arrivalTime) {
     // Compute new position
     const position = xScale(Math.max(0, timeRemaining));
     
-    circle.attr('cx', timeRemaining); // Update the x position of the circle
-    text.attr('x', `${timeRemaining}`); // Update the x position
+    circle.attr('cx', timeRemaining).attr('visibility', 'visible'); // Update the x position of the circle
+    text.attr('x', `${timeRemaining}`).attr('visibility', 'visible'); // Update the x position
 
     // Play sound if the position is 0
     if (timeRemaining < 1) {
@@ -189,6 +219,12 @@ function playSound() {
     audio.play();
 }
 
+function updateCurrentTime() {
+    const currentTimeElement = document.getElementById('current-time');
+    const now = new Date();
+    currentTimeElement.innerText = `${now.toLocaleTimeString()}`;
+}
+
 
 // Start the real-time updates using the feed data
 setInterval(async () => {
@@ -196,7 +232,7 @@ setInterval(async () => {
     if (message) {  // Ensure data is valid
         const arrivals = extractStationArrivals(message, STATION_STOP_ID+DIRECTION);
         arrivals.forEach(train => {
-            updateTrain(train.id, train.route, train.arrival.getTime() / 1000);  // Convert arrival time to Unix timestamp (seconds)
+            updateTrain(train.id, train.route, train.arrival.getTime() / 1000, arrivals);  // Convert arrival time to Unix timestamp (seconds)
         });
     }
 }, 1000);   // Update every second
@@ -206,14 +242,18 @@ window.onload = function () {
     loadStations(); 
     fetchGTFS(); // Initial fetch
     setInterval(fetchGTFS, 10000); // Refresh every 10 sec
+    setInterval(updateCurrentTime, 1000);
 
     document.getElementById('station-select').addEventListener('change', function() {
         STATION_STOP_ID = this.value;
         fetchGTFS(); // Fetch data for the selected station
     });
 
-    document.getElementById('direction-select').addEventListener('change', function() {
-        DIRECTION = this.value;
-        fetchGTFS(); // Fetch data for the selected direction
+    document.querySelectorAll('input[name="direction"]').forEach((elem) => {
+        elem.addEventListener('change', function() {
+            DIRECTION = this.value;
+            console.log(`Selected Direction: ${STATION_STOP_ID + DIRECTION}`); // Log the combined value
+            fetchGTFS(); // Fetch data for the selected direction
+        });
     });
 }

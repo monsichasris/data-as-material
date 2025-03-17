@@ -25,19 +25,18 @@
                     <select id="station-select"></select>
                 </div>
                 <div>
-                    <label for="direction-select">Direction:</label>
-                    <select id="direction-select">
-                        <option value="S">Downtown</option>
-                        <option value="N">Uptown</option>
-                        
-                    </select>
+                    <label>Direction:</label>
+                    <input type="radio" id="uptown" name="direction" value="N">
+                    <label for="uptown">Uptown</label>
+                    <input type="radio" id="downtown" name="direction" value="S" checked>
+                    <label for="downtown">Downtown</label>
                 </div>
             </div>
 
         </div>
     </div>
     
-    <p class="updating" id="status"></p>
+    <p id="current-time"></p>
     <table>
         <thead>
             <tr>
@@ -49,11 +48,8 @@
             <tr><td colspan="2">Loading...</td></tr>
         </tbody>
     </table>
-    <svg id="train-tracks" width="100vw" height="600">
-        <line id="route-4" x1="0%" y1="50" x2="100%" y2="50" stroke="black" stroke-width="3"/>
-        <line id="route-5" x1="0%" y1="100" x2="100%" y2="100" stroke="black" stroke-width="3"/>
-        <line id="route-6" x1="0%" y1="150" x2="100%" y2="150" stroke="black" stroke-width="3"/>
-    </svg>
+    
+    <svg width="100vw" height="600"></svg>
     
 </body>
 </html>
