@@ -12,6 +12,6 @@ h1 {
     font-size: 3rem;
 }
 
-/* circle {
-    transition: cx 1s linear; 
-} */
+table, p {
+   padding-left: 24px;
+}

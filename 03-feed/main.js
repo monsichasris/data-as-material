@@ -27,6 +27,14 @@ function populateDropdown(stations) {
         }
         dropdown.add(option);
     }
+
+    // Add event listener to update station name
+    dropdown.addEventListener('change', function() {
+        const selectedStation = stations[this.value];
+        document.getElementById('station-name').innerText = selectedStation.name;
+        STATION_STOP_ID = this.value;
+        fetchGTFS(); // Fetch data for the selected station
+    });
 }
 
 
