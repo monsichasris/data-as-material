@@ -1,13 +1,24 @@
 
 let STATION_STOP_ID = "635"; // Default stop ID (14 St-Union Sq: downtown)
 let DIRECTION = "S"; // Default direction (downtown)
-const MTA_GTFS_URL = "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs";
+const MTA_GTFS_URLS = [
+    "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs",
+    "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace",
+    "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-g",
+    "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw",
+    "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm",
+    "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-jz",
+    "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l"
+];
+
+let stationsData = {}; // Store stations data
 
 // Load stations from JSON file and populate dropdown menu
 async function loadStations() {
     try {
         const response = await fetch('./assets/stations.json');
         const stations = await response.json();
+        stationsData = stations; // Store stations data
         populateDropdown(stations);
     } catch (error) {
         console.error("Error loading stations:", error);
@@ -40,29 +51,33 @@ function populateDropdown(stations) {
 
 async function fetchGTFS() {
     try {
-        // Fetch GTFS-RT feed
-        const response = await fetch(MTA_GTFS_URL);
-        const data = await response.arrayBuffer();
+        console.log(`Fetching GTFS data for station: ${STATION_STOP_ID}, direction: ${DIRECTION}`);
+        
+        // Fetch GTFS-RT feed from all URLs
+        const responses = await Promise.all(MTA_GTFS_URLS.map(url => fetch(url)));
+        const dataArrays = await Promise.all(responses.map(response => response.arrayBuffer()));
       
         // Load protobuf schema
         const root = await protobuf.load("https://raw.githubusercontent.com/google/transit/master/gtfs-realtime/proto/gtfs-realtime.proto");
         const FeedMessage = root.lookupType("transit_realtime.FeedMessage");
 
-        // Decode GTFS-RT data
-        const message = FeedMessage.decode(new Uint8Array(data));
-
-        // Extract real-time arrivals
-        let arrivals = extractStationArrivals(message, STATION_STOP_ID + DIRECTION);
-
-        // Update the table
-        updateTable(arrivals);
-
-        // Update train positions
-        arrivals.forEach(train => {
-            updateTrain(train.id, train.route, train.arrival.getTime() / 1000, arrivals);  
+        // Decode GTFS-RT data and combine arrivals
+        let combinedArrivals = [];
+        dataArrays.forEach(data => {
+            const message = FeedMessage.decode(new Uint8Array(data));
+            const arrivals = extractStationArrivals(message, STATION_STOP_ID + DIRECTION);
+            combinedArrivals = combinedArrivals.concat(arrivals);
         });
 
-        return message;
+        // Update the table
+        updateTable(combinedArrivals);
+
+        // Update train positions
+        combinedArrivals.forEach(train => {
+            updateTrain(train.id, train.route, train.arrival.getTime() / 1000, combinedArrivals);  
+        });
+
+        return combinedArrivals;
         
     } catch (error) {
         console.error("Error fetching GTFS data:", error);
@@ -73,25 +88,29 @@ async function fetchGTFS() {
 
 function extractStationArrivals(message, stopId) {
     let arrivals = [];
-
-    message.entity.forEach(entity => {
-        if (entity.tripUpdate) {
-            entity.tripUpdate.stopTimeUpdate.forEach(update => {
-                if (update.stopId === stopId && new Date().toLocaleTimeString() < new Date(update.arrival.time * 1000).toLocaleTimeString()) {
-                    let arrivalTime = new Date(update.arrival.time * 1000); // Convert Unix timestamp
-
-                    arrivals.push({
-                        // id: entity.id,
-                        id: entity.tripUpdate.trip.tripId.replace(/\./g, "-"),
-                        route: entity.tripUpdate.trip.routeId || "Unknown",
-                        arrival: arrivalTime
-                    });
-                    
-                }
-                // console.log(arrivals);
-            });
-        }
-    });
+    const selectedStationStops = Object.keys(stationsData[STATION_STOP_ID].stops);
+    console.log("Selected stations " + selectedStationStops);
+    // console.log(message.entity);
+    if (message.entity) {
+        message.entity.forEach(entity => {
+            if (entity.tripUpdate) {
+                entity.tripUpdate.stopTimeUpdate.forEach(update => {
+                    if (selectedStationStops.some(stop => update.stopId.includes(stop)) && new Date().toLocaleTimeString() < new Date(update.arrival.time * 1000).toLocaleTimeString()) {
+                        let arrivalTime = new Date(update.arrival.time * 1000); // Convert Unix timestamp
+                        if (selectedStationStops.some(stop => update.stopId === stop + DIRECTION)) { // Check direction
+                            arrivals.push({
+                                id: entity.tripUpdate.trip.tripId.replace(/\./g, "-"),
+                                route: entity.tripUpdate.trip.routeId || "Unknown",
+                                stop: update.stopId,
+                                arrival: arrivalTime
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }
+    console.log(arrivals);
     
     // Sort by soonest arrival
     return arrivals.sort((a, b) => a.arrival.toLocaleTimeString() - b.arrival.toLocaleTimeString());
@@ -126,7 +145,7 @@ function updateTrain(id, route, arrivalTime, arrivals) {
     const routes = [...new Set(arrivals.map(train => train.route))];
 
     routes.forEach((route, index) => {
-        console.log(`Creating new line for route: ${route}, index: ${index}`);
+        // console.log(`Creating new line for route: ${route}, index: ${index}`);
         svg.append('line')
             .attr('id', `route-${route}`)
             .attr('x1', 0)
@@ -177,6 +196,27 @@ function updateTrain(id, route, arrivalTime, arrivals) {
                                 return '#EE352E'; // red for 123 lines
                             case '7':
                                 return '#B933AD'; // purple for 7 line
+                            case 'N':
+                            case 'W':
+                            case 'Q':
+                            case 'R':
+                                return '#FCCC0A'; // yellow for NWQR lines
+                            case 'B':
+                            case 'D':
+                            case 'F':
+                            case 'M':
+                                return '#FF6319'; // orange for BDFM lines
+                            case 'A':
+                            case 'C':
+                            case 'E':
+                                return '#0039A6'; // blue for ACE lines
+                            case 'J':
+                            case 'Z':
+                                return '#996633'; // brown for JZ lines
+                            case 'L':
+                                return '#A7A9AC'; // gray for L line
+                            case 'G':
+                                return '#6CBE45'; // light green for G line
                             default:
                                 return '#808183'; // default color
                         }
@@ -211,8 +251,9 @@ function updateTrain(id, route, arrivalTime, arrivals) {
     circle.attr('cx', timeRemaining).attr('visibility', 'visible'); // Update the x position of the circle
     text.attr('x', `${timeRemaining}`).attr('visibility', 'visible'); // Update the x position
 
+    // console.log(timeRemaining)
     // Play sound if the position is 0
-    if (timeRemaining < 1) {
+    if (timeRemaining < 1 && trainPositions[id] > 1) {
         playSound();
     }
 
@@ -238,7 +279,7 @@ function updateCurrentTime() {
 setInterval(async () => {
     const message = await fetchGTFS();  // Fetch GTFS data
     if (message) {  // Ensure data is valid
-        const arrivals = extractStationArrivals(message, STATION_STOP_ID+DIRECTION);
+        const arrivals = extractStationArrivals(message, STATION_STOP_ID + DIRECTION);
         arrivals.forEach(train => {
             updateTrain(train.id, train.route, train.arrival.getTime() / 1000, arrivals);  // Convert arrival time to Unix timestamp (seconds)
         });
@@ -246,8 +287,8 @@ setInterval(async () => {
 }, 1000);   // Update every second
 
 
-window.onload = function () {
-    loadStations(); 
+window.onload = async function () {
+    await loadStations(); 
     fetchGTFS(); // Initial fetch
     setInterval(fetchGTFS, 10000); // Refresh every 10 sec
     setInterval(updateCurrentTime, 1000);
@@ -260,8 +301,8 @@ window.onload = function () {
     document.querySelectorAll('input[name="direction"]').forEach((elem) => {
         elem.addEventListener('change', function() {
             DIRECTION = this.value;
-            console.log(`Selected Direction: ${STATION_STOP_ID + DIRECTION}`); // Log the combined value
-            fetchGTFS(); // Fetch data for the selected direction
+            console.log(`Selected Direction: ${STATION_STOP_ID + DIRECTION}`); 
+            fetchGTFS();
         });
     });
 }
